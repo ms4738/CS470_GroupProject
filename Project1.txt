@@ -1,1 +1,6 @@
-Hi group.
+Questions for Jaiswal:
+
+1. Is the packet we create part of the "data" field in the DataGram.
+2. Explain p2p.
+3. Can we hard code all the IP addresses?
+
