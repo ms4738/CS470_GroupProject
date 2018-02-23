@@ -1,6 +1,6 @@
 Questions for Jaiswal:
 
 1. Is the packet we create part of the "data" field in the DataGram.
-2. Explain p2p.
-3. Can we hard code all the IP addresses?
-
+	i.e. version, flags, reserved, (length has datagram field)
+2. How does P2P diagram work?
+3. Can we hard code all the IP addresses or do most have to be dynamic?
