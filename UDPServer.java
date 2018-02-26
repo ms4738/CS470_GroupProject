@@ -47,7 +47,7 @@ public class UDPServer
             byte[] incomingData = new byte[1024];
             
             clearHmap.start();  //Sets all known clients to N/A and starts 30s wait
-            while (true) 
+            while (true)
             {
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, 
                 		incomingData.length);
