@@ -5,48 +5,27 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class UDPServer 
 {
     DatagramSocket socket = null;
-
+    final ConcurrentMap<Integer, Integer> timeHmap = new ConcurrentHashMap<>();
+    String reply;
+    
     public UDPServer() 
     {
 
     }
-    private static class Hmap{
-//    	public HashMap<InetAddress, String> currentHmap = new HashMap<InetAddress, String>();
-    	public HashMap<Integer, String> currentHmap = new HashMap<Integer, String>();
-    }
+    
     public void createAndListenSocket() throws InterruptedException 
     {
-    	final Hmap hmap = new Hmap();
-    	
-    	Thread clearHmap = new Thread() {
-    		@Override
-    		public void run() {
-    				
-    			try {
-    				while (true)
-    				{
-    					Thread.sleep(30000);
-    					System.out.println(hmap.currentHmap.entrySet());
-    					System.out.println("Reset all hashmap values");
-	    				hmap.currentHmap.replaceAll((k, v) -> "Not Available");
-    				}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-    		}
-    	};
-    	
     	try 
         {
             socket = new DatagramSocket(9876);
-            byte[] incomingData = new byte[1024];
+            byte[] incomingData = new byte[512];
             
-            clearHmap.start();  //Sets all known clients to N/A and starts 30s wait
             while (true)
             {
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, 
@@ -55,12 +34,17 @@ public class UDPServer
                 String message = new String(incomingPacket.getData());
                 InetAddress IPAddress = incomingPacket.getAddress();
                 int port = incomingPacket.getPort();
-            	hmap.currentHmap.put(port, "Available");
+                int currentTime = (int)System.currentTimeMillis()/1000;
+                timeHmap.put(port, currentTime);
                 
                 System.out.println("Received message from client: " + message);
                 System.out.println("Client IP:"+IPAddress.getHostAddress());
                 System.out.println("Client port:"+port);
-                String reply = hmap.currentHmap.entrySet().toString();
+                adjustHashMap(port, currentTime);
+                //String reply = timeHmap.entrySet().toString();
+                reply = "[";
+                timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
+                reply += "]";
                 byte[] data = reply.getBytes();
                 
                 DatagramPacket replyPacket =
@@ -83,6 +67,13 @@ public class UDPServer
     	}
     }
 
+    public void adjustHashMap(int port, int currentTime) 
+	{
+		System.out.println("Reset expired hashmap values");
+		timeHmap.put(port, currentTime);
+//		timeHmap.replaceAll((k, v) -> v + 30 > currentTime ? v : 0);
+	}
+    
     public static void main(String[] args) throws InterruptedException 
     {
         UDPServer server = new UDPServer();
