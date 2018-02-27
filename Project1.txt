@@ -1,3 +1,4 @@
+
 Client generates availability packet every 0-30 seconds, send to Server
 
 If no packet is received from Client it is dead
