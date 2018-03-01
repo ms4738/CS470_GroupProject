@@ -2,10 +2,13 @@
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
-public class P2PClient 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+public class P2PClient
 {
     DatagramSocket Socket;
 
@@ -14,21 +17,46 @@ public class P2PClient
 
     }
 
-    public void createAndListenSocket() throws InterruptedException 
+    /**
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public void createAndListenSocket() throws InterruptedException, IOException 
     {
         try 
         {
             Socket = new DatagramSocket();
-            InetAddress IPAddress = InetAddress.getByName("localhost");
+            
+            ArrayList<String> allIP= new ArrayList<String>();
+            //pulling in file name with Team IP's
+            final String FILENAME = "/Users/kooapps/Desktop/CS4Life/CSNetworks/bin/Team_IP.txt";
+            BufferedReader br = new BufferedReader(new FileReader(FILENAME));
+            String sCurrentLine;
             byte[] incomingData = new byte[1024];
             String sentence = "Hi";
             byte[] data = sentence.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, 9876);
-            
+        
+            ArrayList<DatagramPacket> allPackets = new ArrayList<DatagramPacket>();
+            	while ((sCurrentLine = br.readLine()) != null) 
+            	{
+            		//Creating a Datagram Packets for all IP's in file
+            				allIP.add(sCurrentLine);
+            				System.out.println(sCurrentLine);
+            				InetAddress IPAddress = InetAddress.getByName(sCurrentLine);
+            			allPackets.add( new DatagramPacket(data, data.length, IPAddress, 9876));
+            			            	}            
+            	
             Random rand = new Random();
             int randtime;
             while (true)
             {
+            	/**
+            	
+            	*/
+            	
+            	//Attempting to send a recieve packets for all IP's(may need to be in threads )
+            	for(DatagramPacket sendPacket: allPackets )
+            	{
             	randtime = rand.nextInt(31);
 	            Socket.send(sendPacket);
 	            System.out.println("Message sent from client");
@@ -38,6 +66,7 @@ public class P2PClient
 	            System.out.println("Response from server:" + response);
 	            System.out.println("Waiting for: " + randtime + "s");
 	            TimeUnit.SECONDS.sleep(randtime);
+            	}
         	}
         }
         catch (UnknownHostException e) 
@@ -48,14 +77,13 @@ public class P2PClient
         {
             e.printStackTrace();
         } 
-        catch (IOException e) 
-        {
-            e.printStackTrace();
+         
         }
-    }
+    
 
-    public static void main(String[] args) throws InterruptedException 
+    public static void main(String[] args) throws InterruptedException, IOException 
     {
+    
         P2PClient client = new P2PClient();
         client.createAndListenSocket();
     }
