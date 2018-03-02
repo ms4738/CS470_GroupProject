@@ -1,0 +1,18 @@
+Client generates availability packet every 0-30 seconds, send to Server
+
+If no packet is received from Client it is dead
+
+Server sends all clients all availability packets every 30 seconds
+
+A typical protocol packet contains version, length, flags, reserved (	for future) and other major important fields/sections that contain protocol specific information
+
+
+P2P -
+In this mode, each node sends its availability to all other nodes (the IP addresses of all the nodes being available in the IP file) in the network at random interval of time (0-30 seconds). In the output panel, the availability of all the nodes in the network is displayed in the form of a list
+
+
+Must be able to...
+a) To detect node failure periodically 
+b) To inform the other nodes in the network about the failure (peering option) 
+c) To  be able to detect when the failed node comes back to life
+d) To  inform other nodes about the availability of new node

@@ -19,7 +19,7 @@ public class UDPClient
         try 
         {
             Socket = new DatagramSocket();
-            InetAddress IPAddress = InetAddress.getByName("150.243.152.101");
+            InetAddress IPAddress = InetAddress.getByName("150.243.150.80");
             byte[] incomingData = new byte[1024];
             String sentence = "Hi";
             byte[] data = sentence.getBytes();
