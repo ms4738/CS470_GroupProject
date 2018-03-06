@@ -1,6 +1,7 @@
 
 
 import java.io.IOException;
+
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -14,9 +15,13 @@ public class P2PClient
 
     public P2PClient() 
     {
-
+    	ClientComm clientComm = new ClientComm();
+    	clientComm.start();
+    	ServerComm serverComm = new ServerComm();
+    	serverComm.start();
     }
 
+    
     /**
      * @throws InterruptedException
      * @throws IOException
@@ -25,8 +30,7 @@ public class P2PClient
     {
         try 
         {
-            Socket = new DatagramSocket();
-            
+            Socket = new DatagramSocket(); 
             ArrayList<String> allIP= new ArrayList<String>();
             //pulling in file name with Team IP's
             final String FILENAME = "/Users/kooapps/Desktop/CS4Life/CSNetworks/bin/Team_IP.txt";
