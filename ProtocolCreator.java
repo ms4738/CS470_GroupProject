@@ -10,6 +10,7 @@ public class ProtocolCreator {
 	private String up;
 	private String down;
 	private byte[] reply;
+	private byte[] finalReply;
 	public ProtocolCreator(int p2p, int cs, int length, String data, byte[] reply)
 	{
 		
@@ -68,15 +69,14 @@ public class ProtocolCreator {
 			e.printStackTrace();
 		}
 		byte finalReply[] = outputStream.toByteArray( );
-		String s = new String(finalReply);
-		
-		System.out.println(s);
-		System.out.println();
+		this.finalReply = finalReply;
 	}
 	
-	private byte [] getProtocol()
+	public byte [] getProtocol()
 	{
-		return cs.getBytes();
+		return finalReply;
 	}
+
+
 	
 }
