@@ -103,15 +103,6 @@ public class ServerComm extends Thread
 		
 	}
 	
-	public void printCurrentHMap(Map<InetAddress, Integer> timeHmap)
-	{
-		int currentTime = (int)System.currentTimeMillis()/1000;	
-		reply = "[";
-        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
-        reply += "]";
-        
-       System.out.println("This is H Map::" + reply);
-	}
 	
 	public ConcurrentMap<InetAddress, Integer> getTimeHMap()
 	{

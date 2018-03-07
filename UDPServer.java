@@ -87,7 +87,10 @@ public class UDPServer extends Thread
 	    	reply = "[";
 	        timeHmap.forEach((key, IPInformation) -> reply += key + " = " + (currentTime > IPInformation.updateTime + 30 ? "Down, " : "Up, "));
 	        reply += "]";
-	        byte[] data = reply.getBytes();
+
+	        ProtocolCreator p = new ProtocolCreator(0,1,reply.getBytes().length,reply,reply.getBytes());
+	        byte[] data = p.getProtocol();
+
 	
 	        timeHmap.forEach((IPAddress, IPInformation) ->
 	        {

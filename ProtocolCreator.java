@@ -74,8 +74,8 @@ public class ProtocolCreator {
 		}
 		byte finalReply[] = outputStream.toByteArray( );
 		this.finalReply = finalReply;
-		String s = new String(finalReply);
-		System.out.println(s);
+//		String s = new String(finalReply);
+//		System.out.println(s);
 	}
 	
 	 byte [] getProtocol()

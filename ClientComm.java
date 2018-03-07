@@ -120,7 +120,6 @@ public class ClientComm extends Thread {
 					}
 				//GRAB NEW DATA (timeHMap)
 				timeHmap = serverComm.getTimeHMap();
-				
 				printCurrentHMap(timeHmap);
 				
 			}
