@@ -9,6 +9,8 @@ public class ProtocolCreator {
 	private String length;
 	private String up;
 	private String down;
+	private int version = 1;
+	private String procVersion;
 	private byte[] reply;
 	private byte[] finalReply;
 	public ProtocolCreator(int p2p, int cs, int length, String data, byte[] reply)
@@ -19,6 +21,7 @@ public class ProtocolCreator {
 		this.length = Integer.toString(length);
 		this.up = Integer.toString(setUpDown(data,"Up"));
 		this.down = Integer.toString(setUpDown(data,"Down"));
+		procVersion = Integer.toString(version);
 		this.reply = reply;
 		setProtocol();	
 	}
@@ -62,7 +65,8 @@ public class ProtocolCreator {
 			outputStream.write( cs.getBytes() );
 			outputStream.write( length.getBytes() );
 			outputStream.write( up.getBytes() );
-			outputStream.write( down.getBytes() );
+			outputStream.write( down.getBytes());
+			outputStream.write( procVersion.getBytes());
 			outputStream.write( reply );
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -70,9 +74,11 @@ public class ProtocolCreator {
 		}
 		byte finalReply[] = outputStream.toByteArray( );
 		this.finalReply = finalReply;
+		String s = new String(finalReply);
+		System.out.println(s);
 	}
 	
-	public byte [] getProtocol()
+	 byte [] getProtocol()
 	{
 		return finalReply;
 	}
