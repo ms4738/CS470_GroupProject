@@ -30,44 +30,64 @@ public class ServerComm extends Thread
 		{
 			socket = new DatagramSocket(9877);
 	        byte[] incomingData = new byte[512];
+	        
 			while(true)
 			{
 				DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
 	            socket.receive(incomingPacket);
+	            InetAddress IPAddressSender = incomingPacket.getAddress();
 	            String response = new String(incomingPacket.getData());
-                int currentTime = (int)System.currentTimeMillis()/1000;
+	            int currentTime = (int)System.currentTimeMillis()/1000;
 	            response = response.substring(response.indexOf("{")+1, response.indexOf("}"));
 	            String[] responseString = response.split("[,]+", 5);
+	            
+	          //Updating the Sender so they are currentTime
+            	timeHmap.put(IPAddressSender, currentTime);
+	            
 	            for (String ipAndTime : responseString)
 	            {
 	            	String ip = ipAndTime.substring(ipAndTime.indexOf("/")+1,ipAndTime.indexOf("="));	        
                     InetAddress IPAddress = InetAddress.getByName(ip);
 //	            	System.out.println("IP " + ip);
-	            	int time = Integer.parseInt(ipAndTime.substring(ipAndTime.indexOf("=")+1));
+	            	int updateTime = Integer.parseInt(ipAndTime.substring(ipAndTime.indexOf("=")+1));
 //	            	System.out.println(time);
-	            	if(IPAddress.toString().equals(incomingPacket.getAddress().toString()))
+	            	
+	            	if(timeHmap.containsKey(IPAddress))
 	            	{
-	            		timeHmap.put(IPAddress, currentTime);
+	            		if(timeHmap.get(IPAddress) < updateTime)
+	            		{
+	            			timeHmap.put(IPAddress, updateTime);
+	            			System.out.print("Updating hash value\n");
+	            		}
+	            		//Else no changes are needed
 	            	}
 	            	else
 	            	{
-	            		System.out.print(IPAddress.toString() + " " + incomingPacket.getAddress().toString() + "\n");
-	            		if(timeHmap.containsKey(IPAddress))
-	            		{
-	            			if(timeHmap.get(IPAddress) > time)
-	            			{
-		            			timeHmap.put(IPAddress, currentTime);
-		            			System.out.print("Updating hash value");
-	            			}
-	            			            				
-	            		}
-	            		else
-	            		{
-	            			timeHmap.put(IPAddress, -1000000);
-	            		}
+	            		timeHmap.put(IPAddress, updateTime);
 	            	}
-	            	System.out.println("timemaptime is: " + timeHmap.get(IPAddress));
-	            	System.out.println("parsed time is: " + time);
+	            	
+	            	
+	            	
+//	            	if(IPAddress.toString().equals(incomingPacket.getAddress().toString()))
+//	            	{
+//	            		timeHmap.put(IPAddress, currentTime);
+//	            	}
+//	            	else
+//	            	{
+//	            		if(timeHmap.containsKey(IPAddress))
+//	            		{
+//	            			if(timeHmap.get(IPAddress) < updateTime)
+//	            			{
+//		            			timeHmap.put(IPAddress, updateTime);
+//		            			System.out.print("Updating hash value");
+//	            			} 				
+//	            		}
+//	            		else
+//	            		{
+//	            			timeHmap.put(IPAddress, updateTime);
+//	            		}
+//	            	}
+	            	//System.out.println("LastUpdatedTime: " + updateTime + ", TimeFromIP: " + timeHmap.get(IPAddress));
 	            }
 	            
 				
