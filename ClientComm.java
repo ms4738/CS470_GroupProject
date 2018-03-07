@@ -75,9 +75,10 @@ public class ClientComm extends Thread {
 	}
 	public void run()
 	{
+		System.out.print("start");
 		while(true)
 		{
-			int currentTime = (int)System.currentTimeMillis()/1000;	
+			int currentTime = (int)System.currentTimeMillis()/1000 + 400;	
 			Random rand = new Random();
 			reply = timeHmap.toString();
 			
@@ -87,7 +88,7 @@ public class ClientComm extends Thread {
 //			reply = "[";
 //	        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
 //	        reply += "]";
-	        System.out.println(reply);
+//	        System.out.println(reply);
 				int randtime = rand.nextInt(31);
 				//For every  entry in the map send packet
 				for (InetAddress address : timeHmap.keySet())
@@ -105,7 +106,7 @@ public class ClientComm extends Thread {
 					}
 					
 					try {
-					//	System.out.println("Waiting for: " + randtime + "s");	
+						System.out.println("Waiting for: " + randtime + "s");
 						TimeUnit.SECONDS.sleep(randtime);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
