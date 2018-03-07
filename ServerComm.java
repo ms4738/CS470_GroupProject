@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -41,8 +42,8 @@ public class ServerComm extends Thread
 	            response = response.substring(response.indexOf("{")+1, response.indexOf("}"));
 	            String[] responseString = response.split("[,]+", 5);
 	            
-	          //Updating the Sender so they are currentTime
-            	timeHmap.put(IPAddressSender, currentTime);
+	            //Updating the Sender so they are currentTime
+	            timeHmap.put(IPAddressSender, currentTime);
 	            
 	            for (String ipAndTime : responseString)
 	            {
@@ -65,9 +66,7 @@ public class ServerComm extends Thread
 	            	{
 	            		timeHmap.put(IPAddress, updateTime);
 	            	}
-	            	
-	            	
-	            	
+	                      	
 //	            	if(IPAddress.toString().equals(incomingPacket.getAddress().toString()))
 //	            	{
 //	            		timeHmap.put(IPAddress, currentTime);
@@ -90,8 +89,8 @@ public class ServerComm extends Thread
 	            	//System.out.println("LastUpdatedTime: " + updateTime + ", TimeFromIP: " + timeHmap.get(IPAddress));
 	            }
 	            
-				
 			}
+			
 		} 
 		catch (SocketException e) 
 		{
@@ -102,6 +101,16 @@ public class ServerComm extends Thread
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void printCurrentHMap(Map<InetAddress, Integer> timeHmap)
+	{
+		int currentTime = (int)System.currentTimeMillis()/1000;	
+		reply = "[";
+        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
+        reply += "]";
+        
+       System.out.println("This is H Map::" + reply);
 	}
 	
 	public ConcurrentMap<InetAddress, Integer> getTimeHMap()
