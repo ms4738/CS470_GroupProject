@@ -23,6 +23,7 @@ public class ClientComm extends Thread {
 	private ArrayList<DatagramPacket> allPackets;
 	private DatagramSocket socket;
 	private String reply;
+	private byte p2p;
 	ServerComm serverComm;
 
 	public ClientComm()
@@ -30,6 +31,7 @@ public class ClientComm extends Thread {
 		 timeHmap = new ConcurrentHashMap<>();
 		 serverComm = new ServerComm();
 	     serverComm.start();
+	     p2p = 1;
 		//Creat Socket
 		//Stuff for client communication here
 		//Send datagram to all list (with their current list)	
@@ -79,11 +81,19 @@ public class ClientComm extends Thread {
 		{
 			int currentTime = (int)System.currentTimeMillis()/1000;	
 			Random rand = new Random();
-			reply = timeHmap.toString();
-			
+			reply = timeHmap.toString();		
 			byte[] data = reply.getBytes();
 			int randtime = rand.nextInt(31);
-				
+			/**
+			 * NEW LINES
+			 */
+			String setProtocol = "[";
+	        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
+	        setProtocol += "]";
+			ProtocolCreator p = new ProtocolCreator(p2p,(byte)0,data.length,setProtocol,reply);
+			/**
+			 * END OF NEW LINES
+			 */
 				//For every  entry in the map send packet
 				for (InetAddress address : timeHmap.keySet())
 				{
