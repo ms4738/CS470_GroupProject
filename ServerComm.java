@@ -57,7 +57,7 @@ public class ServerComm extends Thread
 	            		if(timeHmap.get(IPAddress) < updateTime)
 	            		{
 	            			timeHmap.put(IPAddress, updateTime);
-	            			System.out.print("Updating hash value\n");
+//	            			System.out.print("Updating hash value\n");
 	            		}
 	            		//Else no changes are needed
 	            	}
