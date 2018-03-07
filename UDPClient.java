@@ -5,23 +5,26 @@ import java.net.*;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class UDPClient 
+public class UDPClient extends Thread
 {
     DatagramSocket Socket;
-
+    
     public UDPClient() 
     {
-
+    	try {
+			Socket = new DatagramSocket();
+		} catch (SocketException e1) {
+			e1.printStackTrace();
+		}
     }
 
-    public void createAndListenSocket() throws InterruptedException 
+    public void sendMessage() throws InterruptedException 
     {
         try 
-        {
-            Socket = new DatagramSocket();
-            InetAddress IPAddress = InetAddress.getByName("150.243.150.80");
-            byte[] incomingData = new byte[1024];
-            String sentence = "Hi";
+        {	
+            InetAddress IPAddress = InetAddress.getByName("150.243.155.155");
+            
+            String sentence = "Hi"; //Some arbitrary message
             byte[] data = sentence.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, 9876);
             
@@ -32,11 +35,7 @@ public class UDPClient
             	randtime = rand.nextInt(31);
 	            Socket.send(sendPacket);
 	            System.out.println("Message sent from client");
-	            DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
-	            Socket.receive(incomingPacket);
-	            String response = new String(incomingPacket.getData());
-	            System.out.println("Response from server:" + response);
-	            System.out.println("Waiting for: " + randtime + "s");
+	            System.out.println("Sending another update in " + randtime + "s");
 	            TimeUnit.SECONDS.sleep(randtime);
         	}
         }
@@ -53,10 +52,28 @@ public class UDPClient
             e.printStackTrace();
         }
     }
+    
+    public void run()
+    {
+    	byte[] incomingData = new byte[1024];
+    	
+    	while (true)
+    	{
+    		DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
+            try {
+				Socket.receive(incomingPacket);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            String response = new String(incomingPacket.getData());
+            System.out.println("Response from server:" + response);
+    	}
+    }
 
     public static void main(String[] args) throws InterruptedException 
     {
         UDPClient client = new UDPClient();
-        client.createAndListenSocket();
+        client.start();
+        client.sendMessage();
     }
 }
