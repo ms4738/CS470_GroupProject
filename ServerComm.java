@@ -45,12 +45,13 @@ public class ServerComm extends Thread
 //	            	System.out.println("IP " + ip);
 	            	int time = Integer.parseInt(ipAndTime.substring(ipAndTime.indexOf("=")+1));
 //	            	System.out.println(time);
-	            	if(ip == incomingPacket.getAddress().toString())
+	            	if(IPAddress.toString().equals(incomingPacket.getAddress().toString()))
 	            	{
 	            		timeHmap.put(IPAddress, currentTime);
 	            	}
 	            	else
 	            	{
+	            		System.out.print(IPAddress.toString() + " " + incomingPacket.getAddress().toString() + "\n");
 	            		if(timeHmap.containsKey(IPAddress))
 	            		{
 	            			if(timeHmap.get(IPAddress) > time)
@@ -62,9 +63,11 @@ public class ServerComm extends Thread
 	            		}
 	            		else
 	            		{
-	            			timeHmap.put(IPAddress, time);
+	            			timeHmap.put(IPAddress, -1000000);
 	            		}
 	            	}
+	            	System.out.println("timemaptime is: " + timeHmap.get(IPAddress));
+	            	System.out.println("parsed time is: " + time);
 	            }
 	            
 				
