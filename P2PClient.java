@@ -89,6 +89,6 @@ public class P2PClient
     {
     
         P2PClient client = new P2PClient();
-        client.createAndListenSocket();
+//        client.createAndListenSocket();
     }
 }

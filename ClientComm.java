@@ -90,7 +90,7 @@ public class ClientComm extends Thread {
 						System.out.println("Sent to:" + address);
 						try {
 							//send a new packet with timehMap data to each entry.getKey(the InetAddress)
-							socket.send(new DatagramPacket(data, data.length, address, 9876));
+							socket.send(new DatagramPacket(data, data.length, address, 9877));
 						//	
 						} catch (IOException e) {
 					//		 TODO Auto-generated catch block

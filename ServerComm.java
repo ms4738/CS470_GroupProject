@@ -27,7 +27,7 @@ public class ServerComm extends Thread
 	{
 		try 
 		{
-			socket = new DatagramSocket(9876);
+			socket = new DatagramSocket(9877);
 	        byte[] incomingData = new byte[512];
 			while(true)
 			{
