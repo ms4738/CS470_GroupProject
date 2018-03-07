@@ -80,9 +80,14 @@ public class ClientComm extends Thread {
 			int currentTime = (int)System.currentTimeMillis()/1000;	
 			Random rand = new Random();
 			reply = timeHmap.toString();
+			
 			//timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
 		
 			byte[] data = reply.getBytes();
+//			reply = "[";
+//	        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
+//	        reply += "]";
+	        System.out.println(reply);
 				int randtime = rand.nextInt(31);
 				//For every  entry in the map send packet
 				for (InetAddress address : timeHmap.keySet())
@@ -109,10 +114,12 @@ public class ClientComm extends Thread {
 				//GRAB NEW DATA (timeHMap)
 				timeHmap = serverComm.getTimeHMap();
 				
+				printCurrentHMap(timeHmap);
+				
 			}
 		}
 	
-	public void printCurrentHMap(ConcurrentMap<InetAddress, Integer> timeHmap)
+	public void printCurrentHMap(Map<InetAddress, Integer> timeHmap)
 	{
 		int currentTime = (int)System.currentTimeMillis()/1000;	
 		reply = "[";

@@ -16,6 +16,7 @@ public class ServerComm extends Thread
 	DatagramSocket socket = null;
     //final ConcurrentMap<Integer, Integer> timeHmap = new ConcurrentHashMap<>();
     final ConcurrentMap<InetAddress, Integer> timeHmap = new ConcurrentHashMap<>();
+    private String reply;
 	
     public ServerComm()
 	{
@@ -58,10 +59,14 @@ public class ServerComm extends Thread
 		            			System.out.print("Updating hash value");
 	            			}
 	            			            				
-	      
+	            		}
+	            		else
+	            		{
+	            			timeHmap.put(IPAddress, time);
 	            		}
 	            	}
 	            }
+	            
 				
 			}
 		} 
