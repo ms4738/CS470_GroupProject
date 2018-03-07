@@ -42,7 +42,7 @@ public class ServerComm extends Thread
 	            System.out.println("LENGTH FLAG: " + s.substring(2,9));
 	            System.out.println("NODES UP: " + s.substring(9,13));
 	            System.out.println("NODES DOWN: " + s.substring(13,17));
-	            System.out.println("VERSION: " + s.substring(17,18));
+	            System.out.println("VERSION: " + s.substring(17,19));
 	            
 	            InetAddress IPAddressSender = incomingPacket.getAddress();
 	            String response = new String(incomingPacket.getData());

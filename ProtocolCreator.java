@@ -19,7 +19,7 @@ public class ProtocolCreator {
 	
 		this.p2p = Integer.toString(p2p);
 		this.cs = Integer.toString(cs);
-		this.length = padZero(length, 6);
+		this.length = padZero(length, 7);
 		this.up = padZero((setUpDown(data,"Up")),4);
 		this.down = padZero((setUpDown(data,"Down")),4);
 		procVersion = padZero(version,2);
