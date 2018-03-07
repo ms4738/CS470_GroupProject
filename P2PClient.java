@@ -17,8 +17,8 @@ public class P2PClient
     {
     	ClientComm clientComm = new ClientComm();
     	clientComm.start();
-    	ServerComm serverComm = new ServerComm();
-    	serverComm.start();
+//    	ServerComm serverComm = new ServerComm();
+//    	serverComm.start();
     }
 
     
