@@ -64,7 +64,7 @@ public class ClientComm extends Thread {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("IP" + IPAddress);
+			//	System.out.println("IP" + IPAddress);
 				timeHmap.put(IPAddress, currentTime);	
 			}
 		} catch (IOException e) {
@@ -87,7 +87,7 @@ public class ClientComm extends Thread {
 				//For every  entry in the map send packet
 				for (InetAddress address : timeHmap.keySet())
 				{
-						System.out.println("Sent to:" + address);
+						//System.out.println("Sent to:" + address);
 						try {
 							//send a new packet with timehMap data to each entry.getKey(the InetAddress)
 							socket.send(new DatagramPacket(data, data.length, address, 9877));
@@ -100,7 +100,7 @@ public class ClientComm extends Thread {
 					}
 					
 					try {
-						System.out.println("Waiting for: " + randtime + "s");	
+					//	System.out.println("Waiting for: " + randtime + "s");	
 						TimeUnit.SECONDS.sleep(randtime);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
