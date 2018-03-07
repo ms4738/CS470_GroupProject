@@ -36,6 +36,14 @@ public class ServerComm extends Thread
 			{
 				DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
 	            socket.receive(incomingPacket);
+		    String s = new String(incomingPacket.getData());
+		    System.out.println("P2P FLAG: " + s.substring(0,1));
+	            System.out.println("CS FLAG: " + s.substring(1,2));
+	            System.out.println("LENGTH FLAG: " + s.substring(2,9));
+	            System.out.println("NODES UP: " + s.substring(9,13));
+	            System.out.println("NODES DOWN: " + s.substring(13,17));
+	            System.out.println("VERSION: " + s.substring(17,18));
+	            
 	            InetAddress IPAddressSender = incomingPacket.getAddress();
 	            String response = new String(incomingPacket.getData());
 	            int currentTime = (int)System.currentTimeMillis()/1000;
