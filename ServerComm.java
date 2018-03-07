@@ -34,15 +34,33 @@ public class ServerComm extends Thread
 				DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
 	            socket.receive(incomingPacket);
 	            String response = new String(incomingPacket.getData());
+                int currentTime = (int)System.currentTimeMillis()/1000;
 	            response = response.substring(response.indexOf("{")+1, response.indexOf("}"));
 	            String[] responseString = response.split("[,]+", 5);
 	            for (String ipAndTime : responseString)
 	            {
-
-	            	String ip = ipAndTime.substring(ipAndTime.indexOf("/")+1,ipAndTime.indexOf("="));
-	            	System.out.println("IP " + ip);
+	            	String ip = ipAndTime.substring(ipAndTime.indexOf("/")+1,ipAndTime.indexOf("="));	        
+                    InetAddress IPAddress = InetAddress.getByName(ip);
+//	            	System.out.println("IP " + ip);
 	            	int time = Integer.parseInt(ipAndTime.substring(ipAndTime.indexOf("=")+1));
-	            	System.out.println(time);
+//	            	System.out.println(time);
+	            	if(ip == incomingPacket.getAddress().toString())
+	            	{
+	            		timeHmap.put(IPAddress, currentTime);
+	            	}
+	            	else
+	            	{
+	            		if(timeHmap.containsKey(IPAddress))
+	            		{
+	            			if(timeHmap.get(IPAddress) > time)
+	            			{
+		            			timeHmap.put(IPAddress, currentTime);
+		            			System.out.print("Updating hash value");
+	            			}
+	            			            				
+	      
+	            		}
+	            	}
 	            }
 				
 			}
@@ -56,6 +74,11 @@ public class ServerComm extends Thread
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public ConcurrentMap<InetAddress, Integer> getTimeHMap()
+	{
+		return timeHmap;
 	}
 
 }

@@ -107,7 +107,17 @@ public class ClientComm extends Thread {
 						e.printStackTrace();
 					}
 				//GRAB NEW DATA (timeHMap)
-				//timeHMap = server.getTimeHMap();
+				timeHmap = serverComm.getTimeHMap();
+				
 			}
 		}
+	
+	public void printCurrentHMap(ConcurrentMap<InetAddress, Integer> timeHmap)
+	{
+		int currentTime = (int)System.currentTimeMillis()/1000;	
+		reply = "[";
+        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
+        reply += "]";
+        System.out.println(reply);
+	}
 }
