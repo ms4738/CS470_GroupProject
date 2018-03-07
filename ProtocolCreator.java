@@ -13,23 +13,37 @@ public class ProtocolCreator {
 	private String procVersion;
 	private byte[] reply;
 	private byte[] finalReply;
+	
 	public ProtocolCreator(int p2p, int cs, int length, String data, byte[] reply)
 	{
-		
+	
 		this.p2p = Integer.toString(p2p);
 		this.cs = Integer.toString(cs);
-		this.length = Integer.toString(length);
-		this.up = Integer.toString(setUpDown(data,"Up"));
-		this.down = Integer.toString(setUpDown(data,"Down"));
-		procVersion = Integer.toString(version);
+		this.length = padZero(length, 6);
+		this.up = padZero((setUpDown(data,"Up")),4);
+		this.down = padZero((setUpDown(data,"Down")),4);
+		procVersion = padZero(version,2);
 		this.reply = reply;
 		setProtocol();	
 	}
-	
+	private String padZero(int num, int padAmount)
+	{
+		String s = Integer.toBinaryString(num);
+		
+		if(s.length() < padAmount)
+		{
+			for(int x = s.length(); x < padAmount; x++)
+			{
+				s = "0" + s;
+			}
+		}
+		return s;
+		
+	}
 	private byte[] intToBytes(int integer)
 	{
 		byte[] bytes = new byte[4];
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 		    bytes[i] = (byte)(integer >>> (i * 8));
 		}
 		return bytes;
@@ -74,15 +88,13 @@ public class ProtocolCreator {
 		}
 		byte finalReply[] = outputStream.toByteArray( );
 		this.finalReply = finalReply;
-//		String s = new String(finalReply);
-//		System.out.println(s);
+		String s = new String(finalReply);
+		System.out.println(s);
 	}
 	
 	 byte [] getProtocol()
 	{
 		return finalReply;
-	}
-
-
+	 }
 	
 }
