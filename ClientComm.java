@@ -65,7 +65,7 @@ public class ClientComm extends Thread {
 					e.printStackTrace();
 				}
 			//	System.out.println("IP" + IPAddress);
-				timeHmap.put(IPAddress, currentTime);	
+				timeHmap.put(IPAddress, -100000);	
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -75,21 +75,15 @@ public class ClientComm extends Thread {
 	}
 	public void run()
 	{
-		System.out.print("start");
 		while(true)
 		{
-			int currentTime = (int)System.currentTimeMillis()/1000 + 400;	
+			int currentTime = (int)System.currentTimeMillis()/1000;	
 			Random rand = new Random();
 			reply = timeHmap.toString();
 			
-			//timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
-		
 			byte[] data = reply.getBytes();
-//			reply = "[";
-//	        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
-//	        reply += "]";
-//	        System.out.println(reply);
-				int randtime = rand.nextInt(31);
+			int randtime = rand.nextInt(31);
+				
 				//For every  entry in the map send packet
 				for (InetAddress address : timeHmap.keySet())
 				{
