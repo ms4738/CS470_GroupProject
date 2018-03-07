@@ -92,8 +92,7 @@ public class ClientComm extends Thread {
 	        timeHmap.forEach((key, updateTime) -> setProtocol += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
 	        setProtocol += "]";
 			ProtocolCreator p = new ProtocolCreator(p2p,0,data.length,setProtocol,timeHmap.toString().getBytes());
-			System.out.print("xxxx::" + setProtocol);
-		//	System.out.print();
+			data = p.getProtocol();
 			/**
 			 * END OF NEW LINES
 			 */
