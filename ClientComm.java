@@ -23,7 +23,7 @@ public class ClientComm extends Thread {
 	private ArrayList<DatagramPacket> allPackets;
 	private DatagramSocket socket;
 	private String reply;
-	private byte p2p;
+	private int p2p;
 	ServerComm serverComm;
 
 	public ClientComm()
@@ -90,7 +90,7 @@ public class ClientComm extends Thread {
 			String setProtocol = "[";
 	        timeHmap.forEach((key, updateTime) -> reply += key + " = " + (currentTime > updateTime + 30 ? "Down, " : "Up, "));
 	        setProtocol += "]";
-			ProtocolCreator p = new ProtocolCreator(p2p,(byte)0,data.length,setProtocol,reply);
+			ProtocolCreator p = new ProtocolCreator(p2p,0,data.length,setProtocol,timeHmap.toString().getBytes());
 			/**
 			 * END OF NEW LINES
 			 */
