@@ -21,12 +21,7 @@ public class ProxyServer {
 	        }
 
 	        while (true) {
-	        	try
-	        	{
-	        		new ProxyThread(serverSocket.accept()).start();	        		
-	        	}
-	        	catch (Exception e) {}
-	        	finally { serverSocket.close(); }
+	        		new ProxyThread(serverSocket.accept()).start();
 	        }
 	    }
 	}
