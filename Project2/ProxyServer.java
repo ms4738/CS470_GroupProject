@@ -1,23 +1,16 @@
 package Project2;
 
-
-
 import java.net.*;
 import java.io.*;
 
 public class ProxyServer {
-
-
-	    public static void main(String[] args) throws IOException {
+		public static void main(String[] args) throws IOException {
 	        ServerSocket serverSocket = null;
-	        boolean listening = true;
 
 	        int port = 10000;	//default
 	        try {
 	            port = Integer.parseInt(args[0]);
-	        } catch (Exception e) {
-	            //ignore me
-	        }
+	        } catch (Exception e) {}
 
 	        try {
 	            serverSocket = new ServerSocket(port);
@@ -27,10 +20,14 @@ public class ProxyServer {
 	            System.exit(-1);
 	        }
 
-	        while (listening) {
-	            new ProxyThread(serverSocket.accept()).start();
+	        while (true) {
+	        	try
+	        	{
+	        		new ProxyThread(serverSocket.accept()).start();	        		
+	        	}
+	        	catch (Exception e) {}
+	        	finally { serverSocket.close(); }
 	        }
-	        serverSocket.close();
 	    }
 	}
 
