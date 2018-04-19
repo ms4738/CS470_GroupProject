@@ -1,7 +1,6 @@
 package Project2;
 
 import java.net.*;
-import java.nio.charset.Charset;
 import java.io.*;
 import java.util.*;
 
@@ -9,12 +8,16 @@ public class ProxyThread extends Thread
 {
    private Socket socket = null;
    private static final int BUFFER_SIZE = 32768;
+   
    public DataOutputStream proxyToClient;
    public BufferedReader clientToProxy;
+   public InputStream serverToProxy;
+   public boolean isCached;
    
    public ProxyThread(Socket socket)
    {
       this.socket = socket;
+      isCached = true;
    }
 
    public void run()
@@ -53,56 +56,17 @@ public class ProxyThread extends Thread
             count++;
          }
          
-         // If cached do this...
-         //sendCachedString("example");
-         //Else...
-         sendServerString(urlToCall);
          
+         //Methods that get run
+         if (ProxyServer.cache.get(urlToCall) == null)
+         {
+        	 isCached = false;
+        	 cacheServerString(urlToCall);
+         }
+         sendCachedString(ProxyServer.cache.get(urlToCall));
+
          
-         // Send client request to the server
-         BufferedReader rd = null;
-         InputStream is = null;
-         try
-         {
-            URL url = new URL(urlToCall);
-            URLConnection conn = url.openConnection();
-            conn.setDoInput(true);
-            conn.setDoOutput(false);
-            String request = "";
-            
-            // Don't know how this works
-            if (conn.getContentLength() > 0)
-            {
-               is = conn.getInputStream();
-               rd = new BufferedReader(new InputStreamReader(is));
-               while (rd.readLine() != null)
-               {
-
-                  request += rd.read();
-
-               }
-            }
-
-            // Send response to client
-            byte by[] = new byte[BUFFER_SIZE];
-            int index = is.read(by, 0, BUFFER_SIZE);
-
-            while (index != -1)
-            {
-            	proxyToClient.write(by, 0, index);
-            	proxyToClient.write(by, 0, index);
-            	index = is.read(by, 0, BUFFER_SIZE);
-            }
-
-            proxyToClient.flush();
-         }
-         catch (Exception e)
-         {
-            System.err.println("Encountered exception: " + e);
-            proxyToClient.writeBytes("");
-         }
-
-         // close out all resources
+         // Cleanup crew
          if (proxyToClient != null)
          {
         	 proxyToClient.close();
@@ -110,6 +74,10 @@ public class ProxyThread extends Thread
          if (clientToProxy != null)
          {
         	 clientToProxy.close();
+         }
+         if (serverToProxy != null)
+         {
+        	 serverToProxy.close();
          }
          if (socket != null)
          {
@@ -122,16 +90,15 @@ public class ProxyThread extends Thread
          e.printStackTrace();
       }
    }
-      
-   private void sendCachedString(String urlToCall)
-   {
-	   
-   }
    
-   private void sendServerString(String urlToCall)
+   //TODO Turn in a PDF with source code, description of design, contributions
+   //any other relevant information
+   
+   //TODO Still needs a thread to periodically checks If-Modified-Since and update if so.
+   //Will need to worry about locking which was addressed in Project 1
+   private void cacheServerString(String urlToCall)
    {
-	// Send client request to the server
-       InputStream is = null;
+	   // Send client request to the server
        try
        {
           URL url = new URL(urlToCall);
@@ -139,30 +106,42 @@ public class ProxyThread extends Thread
           conn.setDoInput(true);
           conn.setDoOutput(false);
 
-          //Don't know how this works
           if (conn.getContentLength() > 0)
           {
-            is = conn.getInputStream();
+        	  serverToProxy = conn.getInputStream();
           }
-
+       }
+       catch (Exception e)
+       {
+          System.err.println("Encountered exception: " + e);
+       }
+       
+       // Save response to hashmap
+       try
+       {
+          byte[] bytes = serverToProxy.readAllBytes();
+          ProxyServer.cache.put(urlToCall, bytes.clone());
+       }
+       catch (Exception e)
+       {
+          System.err.println("Encountered exception: " + e);
+       }
+   }
+   
+   //TODO Still need to also send 304, 400, 501 response codes
+   private void sendCachedString(byte[] bytes)
+   {
+       // Send response to client
+       try
+       {
+          int index = bytes.length;
           
-          // Send response to client
-          byte by[] = new byte[BUFFER_SIZE];
-          int index = is.read(by, 0, BUFFER_SIZE);
-          
-          while (index != -1)
-          {
-        	  proxyToClient.write(by, 0, index);
-             index = is.read(by, 0, BUFFER_SIZE);
-          }
+    	  proxyToClient.write(bytes, 0, index);
           proxyToClient.flush();
        }
        catch (Exception e)
        {
           System.err.println("Encountered exception: " + e);
-          try{
-        	  proxyToClient.writeBytes("");
-          	} catch (IOException e1) {}
        }
    }
 }

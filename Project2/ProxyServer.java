@@ -2,13 +2,18 @@ package Project2;
 
 import java.net.*;
 import java.io.*;
+import java.util.HashMap;
 
 public class ProxyServer
 {
-   public static void main(String[] args) throws IOException
+	static HashMap<String, byte[]> cache;
+   
+   @SuppressWarnings("resource")
+public static void main(String[] args) throws IOException
    {
       ServerSocket serverSocket = null;
-
+      cache = new HashMap<>();
+      
       int port = 10000; // default
       try
       {
