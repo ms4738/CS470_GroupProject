@@ -1,12 +1,13 @@
 package Project2;
 
 import java.net.*;
+import java.nio.charset.Charset;
 import java.io.*;
 import java.util.*;
 
 public class ProxyThread extends Thread
 {
-   private Socket socket = null;
+   private Socket           socket      = null;
    private static final int BUFFER_SIZE = 32768;
 
    public ProxyThread(Socket socket)
@@ -17,26 +18,24 @@ public class ProxyThread extends Thread
    public void run()
    {
       System.out.println("Thread start\n");
-
+      String urlToCall = "";
       try
       {
          DataOutputStream out = new DataOutputStream(socket.getOutputStream());
          BufferedReader in = new BufferedReader(
-        		 new InputStreamReader(socket.getInputStream()));
+               new InputStreamReader(socket.getInputStream()));
 
          String inputLine;
          int count = 0;
-         String urlToCall = "";
 
-         
          // Get request from client
          while ((inputLine = in.readLine()) != null)
          {
             try
             {
-                System.out.println(inputLine);
-                StringTokenizer tok = new StringTokenizer(inputLine);
-                tok.nextToken();
+               System.out.println(inputLine);
+               StringTokenizer tok = new StringTokenizer(inputLine);
+               tok.nextToken();
             }
             catch (Exception e)
             {
@@ -61,24 +60,32 @@ public class ProxyThread extends Thread
             URLConnection conn = url.openConnection();
             conn.setDoInput(true);
             conn.setDoOutput(false);
-
-            //Don't know how this works
+            String request = "";
+            // Don't know how this works
             if (conn.getContentLength() > 0)
             {
-              is = conn.getInputStream();
-              rd = new BufferedReader(new InputStreamReader(is));
+               is = conn.getInputStream();
+               rd = new BufferedReader(new InputStreamReader(is));
+               while (rd.readLine() != null)
+               {
+
+                  request += rd.read();
+
+               }
+               System.out.print(request);
             }
 
-            
             // Send response to client
             byte by[] = new byte[BUFFER_SIZE];
             int index = is.read(by, 0, BUFFER_SIZE);
-            
+
             while (index != -1)
             {
                out.write(by, 0, index);
+               out.write(by, 0, index);
                index = is.read(by, 0, BUFFER_SIZE);
             }
+
             out.flush();
          }
          catch (Exception e)
