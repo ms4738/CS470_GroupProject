@@ -2,17 +2,41 @@ package Project2;
 
 import java.net.*;
 import java.io.*;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
-public class ProxyServer
+public class ProxyServer extends Thread
 {
-	static HashMap<String, byte[]> cache;
+	static ConcurrentMap<String, byte[]> cache;
    
+	//TODO Needs to poll each website for new version
+	public void run()
+    {
+    	while (true)
+    	{
+    		try {
+				TimeUnit.SECONDS.sleep(5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    		
+    		//Constructs a reply with all k/v pairs
+    		cache.forEach((siteAddress, byteInfo) ->
+	        {
+				System.out.println("test");
+	        	//Check If-modified-since
+	        });
+    	}
+    }
+	
    @SuppressWarnings("resource")
 public static void main(String[] args) throws IOException
    {
       ServerSocket serverSocket = null;
-      cache = new HashMap<>();
+      cache = new ConcurrentHashMap<>();
+      ProxyServer server = new ProxyServer();
+      server.start();
       
       int port = 10000; // default
       try

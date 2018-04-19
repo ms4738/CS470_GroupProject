@@ -57,7 +57,7 @@ public class ProxyThread extends Thread
          }
          
          
-         //Methods that get run
+         //Proxy -> Server, Server -> Proxy -> Client
          if (ProxyServer.cache.get(urlToCall) == null)
          {
         	 isCached = false;
@@ -93,9 +93,6 @@ public class ProxyThread extends Thread
    
    //TODO Turn in a PDF with source code, description of design, contributions
    //any other relevant information
-   
-   //TODO Still needs a thread to periodically checks If-Modified-Since and update if so.
-   //Will need to worry about locking which was addressed in Project 1
    private void cacheServerString(String urlToCall)
    {
 	   // Send client request to the server
@@ -105,7 +102,16 @@ public class ProxyThread extends Thread
           URLConnection conn = url.openConnection();
           conn.setDoInput(true);
           conn.setDoOutput(false);
-
+          
+          //This outputs the http header information ONLY if website isn't in cache
+          Map<String, List<String>> map = conn.getHeaderFields();
+          for (Map.Entry<String, List<String>> entry : map.entrySet())
+          {
+        	  System.out.println("Key : " + entry.getKey()
+        			  + " -> value : " + entry.getValue());
+          }
+          
+          //This gets the body of the request (i.e. the website)
           if (conn.getContentLength() > 0)
           {
         	  serverToProxy = conn.getInputStream();
@@ -113,7 +119,7 @@ public class ProxyThread extends Thread
        }
        catch (Exception e)
        {
-          System.err.println("Encountered exception: " + e);
+    	   e.printStackTrace();
        }
        
        // Save response to hashmap
@@ -138,10 +144,15 @@ public class ProxyThread extends Thread
           
     	  proxyToClient.write(bytes, 0, index);
           proxyToClient.flush();
+
+//          This outputs the website onto console
+//          proxyToClient = new DataOutputStream(System.out);
+//          proxyToClient.write(bytes, 0, index);;
+//          proxyToClient.flush();
        }
        catch (Exception e)
        {
-          System.err.println("Encountered exception: " + e);
+          e.printStackTrace();
        }
    }
 }
