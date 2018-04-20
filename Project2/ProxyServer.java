@@ -2,30 +2,84 @@ package Project2;
 
 import java.net.*;
 import java.io.*;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+class WebsiteInfo
+{
+	private byte[] websiteBody;
+	private Date lastModified;
+	private int timeRetreived; //(int)System.currentTimeMillis()/1000;
+	private int statusCode;
+	
+	public void setBody(byte[] bytes)
+	{
+		websiteBody = bytes;
+	}
+	public void setLastModified(Date time)
+	{
+		lastModified = time;
+	}
+	public void setTimeRetreived(int retreived)
+	{
+		timeRetreived = retreived;
+	}
+	public void setStatusCode(int code)
+	{
+		statusCode = code;
+	}
+	public byte[] getBody()
+	{
+		return websiteBody;
+	}
+	public Date getLastModified()
+	{
+		return lastModified;
+	}
+	public int getTimeRetreived()
+	{
+		return timeRetreived;
+	}
+	public int getStatusCode()
+	{
+		return statusCode;
+	}
+}
+
 public class ProxyServer extends Thread
 {
-	static ConcurrentMap<String, byte[]> cache;
-   
-	//TODO Needs to poll each website for new version
+	static ConcurrentMap<String, WebsiteInfo> cache;
+	
 	public void run()
     {
+		int deleteThreshold = 30;
     	while (true)
     	{
     		try {
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(deleteThreshold + 1);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
     		
-    		//Constructs a reply with all k/v pairs
-    		cache.forEach((siteAddress, byteInfo) ->
+    		//Delete unused websites
+    		cache.forEach((siteAddress, websiteInfo) ->
+    		{
+    			if (websiteInfo.getTimeRetreived() + deleteThreshold < (int)System.currentTimeMillis()/1000)
+    			{
+    				System.out.println("Site has been removed");
+    				cache.remove(siteAddress);
+    			}
+    		});
+    		
+    		cache.forEach((siteAddress, websiteInfo) ->
 	        {
-				System.out.println("test");
-	        	//Check If-modified-since
+				System.out.println("SiteAddress: " + siteAddress);
+//				System.out.println("Body: " + websiteInfo.getBody());
+				System.out.println("TimeRetreived: " + websiteInfo.getTimeRetreived());
+				System.out.println("LastModifed: " + websiteInfo.getLastModified());
+				System.out.println("StatusCode: " + websiteInfo.getStatusCode() + "\n");
 	        });
     	}
     }
@@ -35,6 +89,7 @@ public static void main(String[] args) throws IOException
    {
       ServerSocket serverSocket = null;
       cache = new ConcurrentHashMap<>();
+      
       ProxyServer server = new ProxyServer();
       server.start();
       
