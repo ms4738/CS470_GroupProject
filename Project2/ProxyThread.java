@@ -1,4 +1,4 @@
-package Project2;
+//package Project2;
 
 import java.net.*;
 import java.io.*;
@@ -61,6 +61,7 @@ public class ProxyThread extends Thread
          cachedWebsite = ProxyServer.cache.get(urlToCall);
          if (cachedWebsite == null)
          {
+        	 System.out.println("This is a new request");
         	 cachedWebsite = new WebsiteInfo();
         	 isCached = false;
         	 cacheServerString(urlToCall);
@@ -70,7 +71,15 @@ public class ProxyThread extends Thread
          //If website has a different If-Modified-Since, then get that and update the Hashmap
          else if (cachedWebsite.getTimeRetreived() + 10 < (int)System.currentTimeMillis()/1000)
          {
+        	 SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        	 String formattedDate = format.format(new Date(cachedWebsite.getTimeRetreived()-1000000000));
+       	  URLConnection connection = new URL("http://cdn3.sstatic.net/stackoverflow/img/favicon.ico").openConnection();
+       	  connection.setRequestProperty("If-Modified-Since", formattedDate);
+       	  System.out.println(connection.getHeaderFields());
+       	  System.out.println();
+       	 // String holdStr = conn.getHeaderField("Last-Modified");
         	 cacheServerString(urlToCall);
+        	 // String holdStr = conn.getHeaderField("Last-Modified");
          }
          else
          {
@@ -126,12 +135,14 @@ public class ProxyThread extends Thread
           //Formats the date string into a Date
           SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
           format.setTimeZone(TimeZone.getTimeZone("GMT-6"));
+          //We dont needs last modified on the date, just the date that we get it in
           String holdStr = conn.getHeaderField("Last-Modified");
           Date hold;
           if (holdStr != null)
           {
         	  hold = format.parse(holdStr);
         	  cachedWebsite.setLastModified(hold);
+        	  System.out.println(new Date());
           }
           cachedWebsite.setStatusCode(conn.getResponseCode());
           cachedWebsite.setTimeRetreived((int)System.currentTimeMillis()/1000);
@@ -150,8 +161,22 @@ public class ProxyThread extends Thread
        // Save response to hashmap
        try
        {
-          cachedWebsite.setBody(serverToProxy.readAllBytes());
-          ProxyServer.cache.put(urlToCall, cachedWebsite);
+    	   
+    	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    	    int nRead;
+    	    byte[] data = new byte[1024];
+    	    while ((nRead = serverToProxy.read(data, 0, data.length)) != -1) {
+    	        buffer.write(data, 0, nRead);
+    	    }
+    	 
+    	    buffer.flush();
+    	    byte[] byteArray = buffer.toByteArray();
+    	
+    	    //assertThat(text, equalTo(originalString));
+          cachedWebsite.setBody(byteArray);
+          System.out.println(byteArray.toString());
+          // -----> Actual String Representation   System.out.println(new String(byteArray, "UTF-8"));
+       ProxyServer.cache.put(urlToCall, cachedWebsite);
           //ProxyServer.cacheDate.put(urlToCall, Date);
        }
        catch (Exception e)
