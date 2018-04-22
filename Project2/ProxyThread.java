@@ -2,6 +2,7 @@
 
 import java.net.*;
 import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -71,15 +72,17 @@ public class ProxyThread extends Thread
          //If website has a different If-Modified-Since, then get that and update the Hashmap
          else if (cachedWebsite.getTimeRetreived() + 10 < (int)System.currentTimeMillis()/1000)
          {
-        	 SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-        	 String formattedDate = format.format(new Date(cachedWebsite.getTimeRetreived()-1000000000));
-       	  URLConnection connection = new URL("http://cdn3.sstatic.net/stackoverflow/img/favicon.ico").openConnection();
-       	  connection.setRequestProperty("If-Modified-Since", formattedDate);
-       	  System.out.println(connection.getHeaderFields());
-       	  System.out.println();
-       	 // String holdStr = conn.getHeaderField("Last-Modified");
-        	 cacheServerString(urlToCall);
-        	 // String holdStr = conn.getHeaderField("Last-Modified");
+        	SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+       	   URLConnection connection = new URL(urlToCall).openConnection();
+          String holdStr = connection.getHeaderField("Last-Modified");
+       	  Date d = format.parse(holdStr);
+       	 long cachedMillis = cachedWebsite.getLastModified().getTime();
+       	  long websiteMillis = d.getTime();
+       	  //this happens if modified time is more recent
+       	  if(cachedMillis != websiteMillis)
+       	  {
+       		cacheServerString(urlToCall);
+       	  }
          }
          else
          {
@@ -108,7 +111,7 @@ public class ProxyThread extends Thread
          }
 
       }
-      catch (IOException e)
+      catch (IOException | ParseException e)
       {
          e.printStackTrace();
       }
