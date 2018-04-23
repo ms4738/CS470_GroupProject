@@ -1,4 +1,4 @@
-//package Project2;
+package Project2;
 
 import java.net.*;
 import java.io.*;
@@ -40,7 +40,7 @@ public class ProxyThread extends Thread
          {
             try
             {
-               System.out.println(inputLine);
+//               System.out.println(inputLine);
                StringTokenizer tok = new StringTokenizer(inputLine);
                tok.nextToken();
             }
@@ -73,16 +73,16 @@ public class ProxyThread extends Thread
          else if (cachedWebsite.getTimeRetreived() + 10 < (int)System.currentTimeMillis()/1000)
          {
         	SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-       	   URLConnection connection = new URL(urlToCall).openConnection();
-          String holdStr = connection.getHeaderField("Last-Modified");
-       	  Date d = format.parse(holdStr);
-       	 long cachedMillis = cachedWebsite.getLastModified().getTime();
-       	  long websiteMillis = d.getTime();
-       	  //this happens if modified time is more recent
-       	  if(cachedMillis != websiteMillis)
-       	  {
-       		cacheServerString(urlToCall);
-       	  }
+       	   	URLConnection connection = new URL(urlToCall).openConnection();
+       	   	String holdStr = connection.getHeaderField("Last-Modified");
+       	   	Date d = format.parse(holdStr);
+       	   	long cachedMillis = cachedWebsite.getLastModified().getTime();
+       	   	long websiteMillis = d.getTime();
+       	   	//this happens if modified time is more recent
+       	   	if(cachedMillis != websiteMillis)
+       	   	{
+       	   		cacheServerString(urlToCall);
+       	   	}
          }
          else
          {
@@ -91,6 +91,8 @@ public class ProxyThread extends Thread
          }
     	 sendCachedString(cachedWebsite.getBody());
          cachedWebsite = ProxyServer.cache.get(urlToCall);
+         System.out.println("URL:" + urlToCall);
+         cachedWebsite.printWebInfo();
          
          // Cleanup crew
          if (proxyToClient != null)
@@ -127,15 +129,7 @@ public class ProxyThread extends Thread
           conn.setDoInput(true);
           conn.setDoOutput(false);
           
-          //This outputs the http header information
-//          Map<String, List<String>> map = conn.getHeaderFields();
-//          for (Map.Entry<String, List<String>> entry : map.entrySet())
-//          {
-//        	  System.out.println("Key : " + entry.getKey()
-//        			  + " -> value : " + entry.getValue());
-//          }
-          
-          //Formats the date string into a Date
+        //Formats the date string into a Date
           SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
           format.setTimeZone(TimeZone.getTimeZone("GMT-6"));
           //We dont needs last modified on the date, just the date that we get it in
@@ -145,48 +139,80 @@ public class ProxyThread extends Thread
           {
         	  hold = format.parse(holdStr);
         	  cachedWebsite.setLastModified(hold);
-        	  System.out.println(new Date());
+//        	  System.out.println(new Date());
           }
           cachedWebsite.setStatusCode(conn.getResponseCode());
           cachedWebsite.setTimeRetreived((int)System.currentTimeMillis()/1000);
           
-          //This gets the body of the request (i.e. the website)
-          if (conn.getContentLength() > 0)
+          switch (conn.getResponseCode())
           {
-        	  serverToProxy = conn.getInputStream();
+          	case HttpURLConnection.HTTP_OK:
+          	//This gets the body of the request (i.e. the website)
+                if (conn.getContentLength() > 0)
+                {
+              	  serverToProxy = conn.getInputStream();
+                }
+          		saveResponse(urlToCall);
+          		break;
+          	case HttpURLConnection.HTTP_BAD_REQUEST:
+          		cachedWebsite.setBody(conn.getResponseMessage().getBytes());
+          		break;
+          	case HttpURLConnection.HTTP_NOT_IMPLEMENTED:
+          		cachedWebsite.setBody(conn.getResponseMessage().getBytes());
+          		break;
           }
+        	  
+          
+          
+          //This outputs the http header information
+//          Map<String, List<String>> map = conn.getHeaderFields();
+//          for (Map.Entry<String, List<String>> entry : map.entrySet())
+//          {
+//        	  System.out.println("Key : " + entry.getKey()
+//        			  + " -> value : " + entry.getValue());
+//          }
+          
+          
+          
+          
        }
        catch (Exception e)
        {
     	   e.printStackTrace();
        }
-       
-       // Save response to hashmap
-       try
-       {
-    	   
-    	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    	    int nRead;
-    	    byte[] data = new byte[1024];
-    	    while ((nRead = serverToProxy.read(data, 0, data.length)) != -1) {
-    	        buffer.write(data, 0, nRead);
-    	    }
-    	 
-    	    buffer.flush();
-    	    byte[] byteArray = buffer.toByteArray();
-    	
-    	    //assertThat(text, equalTo(originalString));
-          cachedWebsite.setBody(byteArray);
-          System.out.println(byteArray.toString());
-          // -----> Actual String Representation   System.out.println(new String(byteArray, "UTF-8"));
        ProxyServer.cache.put(urlToCall, cachedWebsite);
-          //ProxyServer.cacheDate.put(urlToCall, Date);
-       }
-       catch (Exception e)
-       {
-          System.err.println("Encountered exception: " + e);
-       }
+       
+       
    }
+  
+public void saveResponse(String urlToCall)
+{
+	// Save response to hashmap
+    try
+    {
+ 	   
+ 	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+ 	    int nRead;
+ 	    byte[] data = new byte[1024];
+ 	    while ((nRead = serverToProxy.read(data, 0, data.length)) != -1) {
+ 	        buffer.write(data, 0, nRead);
+ 	    }
+ 	 
+ 	    buffer.flush();
+ 	    byte[] byteArray = buffer.toByteArray();
+ 	
+ 	    //assertThat(text, equalTo(originalString));
+       cachedWebsite.setBody(byteArray);
+//       System.out.println(byteArray.toString());
+       // -----> Actual String Representation   System.out.println(new String(byteArray, "UTF-8"));
+      
+       //ProxyServer.cacheDate.put(urlToCall, Date);
+    }
+    catch (Exception e)
+    {
+       System.err.println("Encountered exception: " + e);
+    }
+}
    
    //TODO Still need to also send 304, 400, 501 response codes to the client (in Header?)
    private void sendCachedString(byte[] bytes)

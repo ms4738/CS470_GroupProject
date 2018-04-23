@@ -46,6 +46,13 @@ class WebsiteInfo
 	{
 		return statusCode;
 	}
+	public void printWebInfo()
+	{
+		System.out.println("Body: " + this.getBody().toString());
+		System.out.println("TimeRetreived: " + this.getTimeRetreived());
+		System.out.println("LastModifed: " + this.getLastModified());
+		System.out.println("StatusCode: " + this.getStatusCode() + "\n");
+	}
 }
 
 public class ProxyServer extends Thread
@@ -72,15 +79,15 @@ public class ProxyServer extends Thread
     				cache.remove(siteAddress);
     			}
     		});
-    		
-    		cache.forEach((siteAddress, websiteInfo) ->
-	        {
-				System.out.println("SiteAddress: " + siteAddress);
-//				System.out.println("Body: " + websiteInfo.getBody());
-				System.out.println("TimeRetreived: " + websiteInfo.getTimeRetreived());
-				System.out.println("LastModifed: " + websiteInfo.getLastModified());
-				System.out.println("StatusCode: " + websiteInfo.getStatusCode() + "\n");
-	        });
+//    		System.out.println("ALL CACHED WEBSITES");
+//    		cache.forEach((siteAddress, websiteInfo) ->
+//	        {
+//				System.out.println("SiteAddress: " + siteAddress);
+//				System.out.println("Body: " + websiteInfo.getBody().toString());
+//				System.out.println("TimeRetreived: " + websiteInfo.getTimeRetreived());
+//				System.out.println("LastModifed: " + websiteInfo.getLastModified());
+//				System.out.println("StatusCode: " + websiteInfo.getStatusCode() + "\n");
+//	        });
     	}
     }
 	
