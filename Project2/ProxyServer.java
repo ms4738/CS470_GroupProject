@@ -1,7 +1,6 @@
 package Project2;
 
 import java.net.*;
-import java.text.SimpleDateFormat;
 import java.io.*;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,74 +64,36 @@ public class ProxyServer extends Thread
 	 * recent modifications of the websites have been updated in the cache
 	 */
 	public void run()
-	{
-		int refresh = 30;
-		while (true)
-		{
-			try 
-			{
-				TimeUnit.SECONDS.sleep(refresh + 1);
-			} 
-			catch (InterruptedException e) 
-			{
+    {
+		int deleteThreshold = 30;
+    	while (true)
+    	{
+    		try {
+				TimeUnit.SECONDS.sleep(deleteThreshold + 1);
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
-			//Refresh cache for modified web urls
-			cache.forEach((siteAddress, websiteInfo) ->
-			{
-				InputStream serverToProxy = null;
-				try
-				{
-					SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-					URL connection = new URL(siteAddress);
-					HttpURLConnection conn = (HttpURLConnection) connection.openConnection();
-					String holdStr = conn.getHeaderField("Last-Modified");
-					Date d = format.parse(holdStr);
-					long cachedMillis = websiteInfo.getLastModified().getTime();
-					long websiteMillis = d.getTime();
-					//this happens if modified time is more recent
-					if(cachedMillis <= websiteMillis)
-					{
-						websiteInfo.setStatusCode(conn.getResponseCode());
-						websiteInfo.setTimeRetreived((int)System.currentTimeMillis()/1000);
-						websiteInfo.setLastModified(d);
-						if (conn.getContentLength() > 0)
-						{
-							serverToProxy = conn.getInputStream();
-						}
-
-
-						try
-						{
-
-							ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-							int nRead;
-							byte[] data = new byte[1024];
-							while ((nRead = serverToProxy.read(data, 0, data.length)) != -1) {
-								buffer.write(data, 0, nRead);
-							}
-							buffer.flush();
-							byte[] byteArray = buffer.toByteArray();
-							websiteInfo.setBody(byteArray);
-						}
-						catch (Exception e)
-						{
-							System.err.println("Encountered exception: " + e);
-						}
-						System.out.println("UPDATED:");
-						websiteInfo.printWebInfo();
-					}
-					
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-
-			});
-		}
-	}
+    		
+    		//Delete unused websites
+    		cache.forEach((siteAddress, websiteInfo) ->
+    		{
+    			if (websiteInfo.getTimeRetreived() + deleteThreshold < (int)System.currentTimeMillis()/1000)
+    			{
+    				System.out.println("Site has been removed");
+    				cache.remove(siteAddress);
+    			}
+    		});
+    		
+    		cache.forEach((siteAddress, websiteInfo) ->
+	        {
+				System.out.println("SiteAddress: " + siteAddress);
+//				System.out.println("Body: " + websiteInfo.getBody());
+				System.out.println("TimeRetreived: " + websiteInfo.getTimeRetreived());
+				System.out.println("LastModifed: " + websiteInfo.getLastModified());
+				System.out.println("StatusCode: " + websiteInfo.getStatusCode() + "\n");
+	        });
+    	}
+    }
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException

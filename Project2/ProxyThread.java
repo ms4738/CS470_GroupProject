@@ -199,9 +199,13 @@ public class ProxyThread extends Thread
 	 */
 	private void sendCachedString(byte[] bytes)
 	{
+		int index = 0;
 		try
 		{
-			int index = bytes.length;         
+			if (bytes != null)
+			{
+				index = bytes.length;
+			}
 			proxyToClient.write(bytes, 0, index);
 			proxyToClient.flush();
 		}
