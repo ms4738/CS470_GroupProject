@@ -48,12 +48,15 @@ class WebsiteInfo
 	}
 	public void printWebInfo() throws UnsupportedEncodingException
 	{
-		System.out.println("Body: " + new String(this.getBody(), "UTF-8"));
+//		System.out.println("Body: " + new String(this.getBody(), "UTF-8"));
 		System.out.println("TimeRetreived: " + this.getTimeRetreived());
 		System.out.println("LastModifed: " + this.getLastModified());
 		System.out.println("StatusCode: " + this.getStatusCode() + "\n");
 	}
 }
+
+//good example site
+//http://www.china.org.cn/
 
 public class ProxyServer extends Thread
 {

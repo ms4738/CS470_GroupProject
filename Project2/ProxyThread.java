@@ -69,9 +69,14 @@ public class ProxyThread extends Thread
 				SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 				URLConnection connection = new URL(urlToCall).openConnection();
 				String holdStr = connection.getHeaderField("Last-Modified");
-				Date d = format.parse(holdStr);
+				Date d ;
+				long websiteMillis = 0;
+				if (holdStr != null)
+				{
+					d = format.parse(holdStr);					
+					websiteMillis = d.getTime();
+				}
 				long cachedMillis = cachedWebsite.getLastModified().getTime();
-				long websiteMillis = d.getTime();
 				//this happens if modified time is more recent
 				if(cachedMillis != websiteMillis)
 				{
