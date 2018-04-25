@@ -143,9 +143,13 @@ public class ProxyThread extends Thread
 			}
 			cachedWebsite.setStatusCode(conn.getResponseCode());
 			cachedWebsite.setTimeRetreived((int)System.currentTimeMillis()/1000);
-
-			switch (conn.getResponseCode())
+				
+			int candy = conn.getResponseCode();
+			switch (candy)
 			{
+			case HttpURLConnection.HTTP_NOT_FOUND:
+				cachedWebsite.setBody(conn.getResponseMessage().getBytes());
+				break;
 			case HttpURLConnection.HTTP_OK:
 				//This gets the body of the request (i.e. the website)
 				if (conn.getContentLength() > 0)
@@ -158,6 +162,9 @@ public class ProxyThread extends Thread
 				cachedWebsite.setBody(conn.getResponseMessage().getBytes());
 				break;
 			case HttpURLConnection.HTTP_NOT_IMPLEMENTED:
+				cachedWebsite.setBody(conn.getResponseMessage().getBytes());
+				break;
+			default:
 				cachedWebsite.setBody(conn.getResponseMessage().getBytes());
 				break;
 			}
